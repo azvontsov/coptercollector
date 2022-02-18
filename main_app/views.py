@@ -22,3 +22,7 @@ def copters_index(request):
 def copters_index(request):
     copters = Copter.objects.all()
     return render(request, 'copters/index.html', { 'copters': copters })
+
+def copters_detail(request, copter_id):
+    copter = Copter.objects.get(id=copter_id)
+    return render(request, 'copters/detail.html', { 'copter' : copter })

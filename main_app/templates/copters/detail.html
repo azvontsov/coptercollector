@@ -1,0 +1,18 @@
+{% extends 'base.html' %} {% block content %}
+
+<h1>Copter Details</h1>
+
+<div class="card">
+  <div class="card-content purple-text text-darken-4 green lighten-3 z-depth-3">
+    <span class="card-title">{{ copter.name }}</span>
+    <p>Model: {{ copter.model }}</p>
+    <p>Description: {{ copter.description }}</p>
+    {% if copter.price > 100 %}
+    <p>Price: ${{ copter.price }}</p>
+    {% else %}
+    <p>Price: Sold!</p>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
