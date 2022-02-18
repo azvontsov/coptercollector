@@ -4,12 +4,12 @@
 
 {% for copter in copters %}
 <div class="card">
-  <div class="card-content">
+  <div class="card-content light-blue darken-1 z-depth-3">
     <span class="card-title">{{ copter.name }}</span>
     <p>Model: {{ copter.model }}</p>
     <p>Description: {{ copter.description }}</p>
     {% if copter.price > 100 %}
-    <p>Price: {{ copter.price }}</p>
+    <p>Price: ${{ copter.price }}</p>
     {% else %}
     <p>Price: Sold!</p>
     {% endif %}
