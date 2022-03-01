@@ -1,31 +1,107 @@
 {% extends 'base.html' %} {% block content %}
 
-<h1>Copter Details</h1>
+<h1>Copter Detail</h1>
 
 <div class="row">
   <div class="col s6">
     <div class="card">
-      <div
-        class="card-content purple-text text-darken-4 green lighten-3 z-depth-3"
-      >
+      <div class="card-content">
         <span class="card-title">{{ copter.name }}</span>
         <p>Model: {{ copter.model }}</p>
-        <p>Description: {{ copter.description }}</p>
-        {% if copter.price > 100 %}
-        <p>Price: ${{ copter.price }}</p>
-        {% else %}
-        <p>Price: Sold!</p>
-        {% endif %}
+        <p>Price: {{ copter.price }}</p>
       </div>
-      <div class="card-action green darken-2 z-depth-3">
-        <a class="purple-text" href="{% url 'copters_update' copter.id %}"
-          >Edit</a
-        >
-        <a class="purple-text" href="{% url 'copters_delete' copter.id %}"
-          >Delete</a
-        >
+      <div class="card-action">
+        <a href="{% url 'copters_update' copter.id %}">Edit</a>
+        <a href="{% url 'copters_delete' copter.id %}">Delete</a>
       </div>
     </div>
+    {% for photo in copter.photo_set.all %}
+    <img
+      src="{{ photo.url }}"
+      alt="{{ copter.name }}"
+      class="responsive-img card-panel"
+    />
+    {% empty %}
+    <div class="card-panel teal-text center-align">No Photos Uploaded</div>
+    {% endfor %}
+
+    <form
+      action="{% url 'add_photo' copter.id %}"
+      class="card-panel"
+      method="POST"
+      enctype="multipart/form-data"
+    >
+      {% csrf_token %}
+      <input type="file" name="photo-file" />
+      <br />
+      <br />
+      <input type="submit" value="Upload Photo" class="btn green" />
+    </form>
+  </div>
+  <div class="col s6">
+    <form action="{% url 'add_charging' copter.id %}" method="POST">
+      {% csrf_token %} {{ charging_form.as_p }}
+      <input type="submit" value="Charge" class="btn blue" />
+    </form>
+    <table class="striped">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Charge</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for charging in copter.charging_set.all %}
+        <tr>
+          <td>{{ charging.date }}</td>
+          <td>{{ charging.get_charge_display }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </div>
+
+<hr />
+
+<div class="row">
+  <div class="col s6">
+    <h3>{{ copter.name }}'s Kits</h3>
+    {% if copter.kits.count %} {% for kit in copter.kits.all %}
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">
+          A
+          <span class="{{kit.price.lower}}-text">{{kit.price}}</span>
+          {{kit.name}}
+        </span>
+      </div>
+    </div>
+    {% endfor %} {% else %}
+    <h6>{{copter.name}} has no kits at this time</h6>
+    {% endif %}
+  </div>
+
+  <div class="col s6">
+    <h3>Available Kits</h3>
+    {% if kits.count %} {% for kit in kits %}
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">
+          A <span class="{{ kit.price.lower }}-text">{{kit.name}}</span>
+        </span>
+      </div>
+      <div class="card-action">
+        <form action="{% url 'assoc_kit' copter.id kit.id %}" method="POST">
+          {% csrf_token %}
+          <button type="submit" class="btn green">Add</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %} {% else %}
+    <h6>{{ copter.name }} already has all kits available</h6>
+    {% endif %}
+  </div>
+</div>
+
 {% endblock %}

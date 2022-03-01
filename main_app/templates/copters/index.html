@@ -5,19 +5,11 @@
 {% for copter in copters %}
 <div class="card">
   <a href="{% url 'detail' copter.id %}">
-    <div
-      class="card-content purple-text text-darken-4 yellow darken-1 z-depth-3"
-    >
+    <div class="card-content">
       <span class="card-title">{{ copter.name }}</span>
       <p>Model: {{ copter.model }}</p>
-      <p>Description: {{ copter.description }}</p>
-      {% if copter.price > 100 %}
-      <p>Price: ${{ copter.price }}</p>
-      {% else %}
-      <p>Price: Sold!</p>
-      {% endif %}
+      <p>Price: {{ copter.price }}</p>
     </div>
   </a>
 </div>
-
 {% endfor %} {% endblock %}
