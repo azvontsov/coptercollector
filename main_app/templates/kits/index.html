@@ -4,7 +4,7 @@
 {% for kit in object_list %}
 <div class="card">
   <a href="{% url 'kits_detail' kit.id %}">
-    <div class="card-content">
+    <div class="card-content green lighten-4">
       <span class="card-title"
         >A <span class="{{ kit.price }}-text"></span> {{ kit.name }}</span
       >

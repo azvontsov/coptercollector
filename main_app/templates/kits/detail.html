@@ -3,17 +3,17 @@
 <h1>Kit Details</h1>
 
 <div class="card">
-  <a href="{% url 'kits_detail' kit.id %}">
-    <div class="card-content">
+  <a class="purple-text" href="{% url 'kits_detail' kit.id %}">
+    <div class="card-content green lighten-2">
       <span class="card-title"
         >A $
         <span class="{{ kit.price.lower }}-text">{{ kit.price }}</span>
         {{ kit.name }}</span
       >
     </div>
-    <div class="card-action">
-      <a href="{% url 'kits_update' kit.id %}">Edit</a>
-      <a href="{% url 'kits_delete' kit.id %}">Delete</a>
+    <div class="card-action green darken-2">
+      <a class="purple-text" href="{% url 'kits_update' kit.id %}">Edit</a>
+      <a class="purple-text" href="{% url 'kits_delete' kit.id %}">Delete</a>
     </div>
   </a>
 </div>

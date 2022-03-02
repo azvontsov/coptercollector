@@ -8,7 +8,7 @@
       <div class="card-content">
         <span class="card-title">{{ copter.name }}</span>
         <p>Model: {{ copter.model }}</p>
-        <p>Price: {{ copter.price }}</p>
+        <p>Price: ${{ copter.price }}</p>
       </div>
       <div class="card-action">
         <a href="{% url 'copters_update' copter.id %}">Edit</a>
@@ -72,7 +72,7 @@
       <div class="card-content">
         <span class="card-title">
           A
-          <span class="{{kit.price.lower}}-text">{{kit.price}}</span>
+          <span class="{{kit.price.lower}}-text">${{kit.price}}</span>
           {{kit.name}}
         </span>
       </div>
