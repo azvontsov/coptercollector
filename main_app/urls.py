@@ -17,5 +17,6 @@ urlpatterns = [
     path('kits/<int:pk>/update/', views.KitUpdate.as_view(), name='kits_update'),
     path('kits/<int:pk>/delete/', views.KitDelete.as_view(), name='kits_delete'),
     path('copters/<int:copter_id>/assoc_kit/<int:kit_id>/', views.assoc_kit, name='assoc_kit'),
-    path('copters/<int:copter_id>/add_photo/', views.add_photo, name='add_photo'),   
+    path('copters/<int:copter_id>/add_photo/', views.add_photo, name='add_photo'),
+    path('accounts/signup/', views.signup, name='signup'),   
 ]

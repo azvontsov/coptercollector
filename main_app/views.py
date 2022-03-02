@@ -4,6 +4,11 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Copter, Kit, Photo
 from .forms import ChargingForm
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
+
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 import uuid
 import boto3
@@ -18,10 +23,12 @@ def home(request):
 def about(request):
     return render(request, 'about.html')
 
+@login_required
 def copters_index(request):
     copters = Copter.objects.all()
     return render(request, 'copters/index.html', {'copters': copters})
 
+@login_required
 def copters_detail(request, copter_id):
    copter = Copter.objects.get(id=copter_id)
    charging_form = ChargingForm()
@@ -34,70 +41,89 @@ def copters_detail(request, copter_id):
        'kits': kits_copter_doesnt_have 
     })
 
+@login_required
 def add_charging(request, copter_id):
-    # 1) collect form input values
+    
     form = ChargingForm(request.POST)
-    # 2) valid input values
+   
     if form.is_valid():
-        # 3) save a copy of a new charging instance in memory
+        
         new_charging = form.save(commit=False)
-        # 4) attach a reference to the copter that owns the charging
+        
         new_charging.copter_id = copter_id
-        # 5) save the new charging to the database
+       
         new_charging.save()
-    # 6) redirect the user back to the detail
+  
     return redirect('detail', copter_id=copter_id)
 
-# Renders a template with a form on it
-# Creates a model form based on the model
-# Responds to GET and POST requests
-#  1) GET render the new copter form
-#  2) POST submit the form to create a new instance
-# Validate form inputs
-# Handles the necessary redirect following a model instance creating
 
+@login_required
 def assoc_kit(request, copter_id, kit_id):
     Copter.objects.get(id=copter_id).kits.add(kit_id)
     return redirect('detail', copter_id=copter_id)
 
+@login_required
 def add_photo(request, copter_id):
-    # attempt to collect the photo information from the form submission
+    
     photo_file = request.FILES.get('photo-file')
-    # use an if statement to see if the photo information is present or not
-    # if photo present
+    
+    
     if photo_file:
-        # initialize a reference to the s3 service from boto3
+        
         s3 = boto3.client('s3')
-        # create a unique name for the photo asset
+        
         key = uuid.uuid4().hex[:6] + photo_file.name[photo_file.name.rfind('.'):]
-        # attempt to upload the photo asset to AWS S3
+        
         try:
             s3.upload_fileobj(photo_file, BUCKET, key)
-            # Save a secure url to the AWS S3 hosted photo asset to the database
+            #
             url = f"{S3_BASE_URL}{BUCKET}/{key}"
 
             photo = Photo(url=url, copter_id=copter_id)
             
             photo.save()
-            # if upload is not successful
+            
         except Exception as error:
             print('An error occurred while uploading to S3')
             print(error)
 
-            # print errors to the console
-        # return a response as a redirect to the client - redirecting to the detail page
+            
     return redirect('detail', copter_id=copter_id)
 
+def signup(request):
+    error_message = ''
+    # check for a POST request
+    if request.method == 'POST':
+        # capture form inputs
+        form = UserCreationForm(request.POST)
+        # validate form inputs (make sure everything we need is there)
+        if form.is_valid():
+            # save the new user to the database
+            user = form.save()
+            # log the new user in
+            login(request, user)
+            # redirect to the cats index page
+            return redirect('index')
+        # if form is not valid
+        else:
+            error_message = 'invalid sign up - please try again'
+            # redirect back to /accounts/signup and display error message
+    # If GET request
+        # render a signup page with a blank user creation form
+    form = UserCreationForm()
+    context = { 'form': form, 'error': error_message }
+    return render(request, 'registration/signup.html', context)
 
-
-class CopterCreate(CreateView):
+class CopterCreate(LoginRequiredMixin, CreateView):
     model = Copter
     fields = ['name', 'model', 'price']
-    # fields = '__all__'
-    # success_url = '/copters/' this will work, but it's not preferred
-    # Fat Models, Skinny Controllers
 
-class CopterUpdate(UpdateView):
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+    
+
+class CopterUpdate(LoginRequiredMixin, UpdateView):
     model = Copter
     fields = ('name', 'model', 'price')
 
@@ -105,26 +131,26 @@ class CopterDelete(DeleteView):
     model = Copter
     success_url = '/copters/'
 
-class KitCreate(CreateView):
+class KitCreate(LoginRequiredMixin, CreateView):
     model = Kit
     fields = ('name', 'price')
 
 
-class KitUpdate(UpdateView):
+class KitUpdate(LoginRequiredMixin, UpdateView):
     model = Kit
     fields = ('name', 'price')
 
 
-class KitDelete(DeleteView):
+class KitDelete(LoginRequiredMixin, DeleteView):
     model = Kit
     success_url = '/kits/'
 
 
-class KitDetail(DetailView):
+class KitDetail(LoginRequiredMixin, DetailView):
     model = Kit
     template_name = 'kits/detail.html'
 
 
-class KitList(ListView):
+class KitList(LoginRequiredMixin, ListView):
     model = Kit
     template_name = 'kits/index.html'

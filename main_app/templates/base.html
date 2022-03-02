@@ -29,10 +29,16 @@
           </ul>
           <ul class="right">
             <li><a href="{% url 'about' %}">About</a></li>
+            {% if user.is_authenticated %}
             <li><a href="{% url 'kits_create' %}">Add a Kit</a></li>
             <li><a href="{% url 'kits_index' %}">View All Kits</a></li>
             <li><a href="{% url 'copters_create' %}">Add a Copter</a></li>
             <li><a href="/copters">View All My Copters</a></li>
+            <li><a href="{% url 'logout' %}">Log Out</a></li>
+            {% else %}
+            <li><a href="{% url 'login' %}">Log In</a></li>
+            <li><a href="{% url 'signup' %}">Sign Up</a></li>
+            {% endif %}
           </ul>
         </div>
       </nav>
