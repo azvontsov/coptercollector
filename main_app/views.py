@@ -15,7 +15,7 @@ import boto3
 
 
 S3_BASE_URL = 'https://s3.us-east-1.amazonaws.com/'
-BUCKET = 'coptercollector-az'
+BUCKET = 'coptercollector'
 
 def home(request):
     return render(request, 'home.html')
@@ -94,22 +94,21 @@ def signup(request):
     error_message = ''
     # check for a POST request
     if request.method == 'POST':
-        # capture form inputs
+        
         form = UserCreationForm(request.POST)
-        # validate form inputs (make sure everything we need is there)
+        
         if form.is_valid():
-            # save the new user to the database
+           
             user = form.save()
-            # log the new user in
+            
             login(request, user)
-            # redirect to the cats index page
+            
             return redirect('index')
-        # if form is not valid
+        
         else:
             error_message = 'invalid sign up - please try again'
-            # redirect back to /accounts/signup and display error message
-    # If GET request
-        # render a signup page with a blank user creation form
+            age
+    
     form = UserCreationForm()
     context = { 'form': form, 'error': error_message }
     return render(request, 'registration/signup.html', context)
